@@ -2,31 +2,74 @@
 
 namespace App\Blog;
 
+use App\Blog\Post;
+use App\Blog\User;
+
 class Comment
 {
    
     public function __construct(
-        private int $id,
+        private UUID $uuid,
+        private Post $post,
         private User $author,
-        private Post $storyComment,
         private string $text
     ) {
     }
 
     public function __toString()
     {
-    return $this->storyComment . PHP_EOL 
+    return $this->post . PHP_EOL 
         . 'was commented by ' . $this->author . PHP_EOL 
         . $this->text;
     }
     /**
      * Get the value of id
      */ 
-    public function id(): Int
+    public function uuid(): UUID
     {
-        return $this->id;
+        return $this->uuid;
     }
     
+     /**
+     * Get the value of storyComment
+     */ 
+    public function getPost(): Post
+    {
+        return $this->post;
+    }
+
+    /**
+     * Set the value of storyComment
+     *
+     * @return  self
+     */ 
+    public function setPost(Post $post): Comment
+    {
+        $this->post = $post;
+
+        return $this;
+    }
+    
+    /**
+     * Get the value of author
+     */ 
+    public function getAuthor(): User
+    {
+        return $this->author;
+    }
+    
+    /**
+     * Set the value of author
+     *
+     * @return  self
+     */ 
+    public function setAuthor(User $author): Comment
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
     /**
      * Get the value of text
      */ 

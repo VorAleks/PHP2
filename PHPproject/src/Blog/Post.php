@@ -2,13 +2,15 @@
 
 namespace App\Blog;
 
+use App\Blog\User;
+
 class Post
 {
     
     public function __construct(
-        private int $id,
+        private UUID $uuid,
         private User $author,
-        private string $header,
+        private string $title,
         private string $text
     ) {
     }
@@ -16,24 +18,45 @@ class Post
     public function __toString()
     {
     return $this->author . PHP_EOL 
-    . 'Заголовок: ' . $this->header . PHP_EOL 
+    . 'Заголовок: ' . $this->title . PHP_EOL 
     . $this->text;
     }
 
     /**
      * Get the value of id
      */ 
-    public function id(): Int
+    public function uuid(): UUID
     {
-        return $this->id;
+        return $this->uuid;
     }
 
-        /**
+    
+    /**
+     * Get the value of author
+     */ 
+    public function getAuthor(): User
+    {
+        return $this->author;
+    }
+
+    /**
+     * Set the value of author
+     *
+     * @return  self
+     */ 
+    public function setAuthor(User $author): Post
+    {
+        $this->author = $author;
+
+        return $this;
+    }
+
+    /**
      * Get the value of header
      */ 
-    public function getHeader(): String
+    public function getTitle(): String
     {
-        return $this->header;
+        return $this->title;
     }
 
     /**
@@ -41,9 +64,9 @@ class Post
      *
      * @return  self
      */ 
-    public function setHeader(string $header): Post
+    public function setTitle(string $title): Post
     {
-        $this->header = $header;
+        $this->title = $title;
 
         return $this;
     }
@@ -67,4 +90,6 @@ class Post
 
         return $this;
     }
+
+        
 }
