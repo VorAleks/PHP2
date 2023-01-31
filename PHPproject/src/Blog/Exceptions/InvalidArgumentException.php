@@ -1,7 +1,7 @@
 <?php
-namespace App\Blog\Exceptions;
+namespace GeekBrains\LevelTwo\Blog\Exceptions;
 
-use App\Blog\Exceptions\AppException;
+use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
 
 class InvalidArgumentException extends AppException
 {
