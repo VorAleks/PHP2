@@ -1,9 +1,9 @@
 <?php
-namespace App\Blog\Repositories\UsersRepository;
+namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
 
-use App\Person\Name;
-use App\Blog\User;
-use App\Blog\UUID;
+use GeekBrains\LevelTwo\Person\Name;
+use GeekBrains\LevelTwo\Blog\User;
+use GeekBrains\LevelTwo\Blog\UUID;
 use PDO;
 use PDOStatement;
 

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Blog\Commands;
+namespace GeekBrains\LevelTwo\Blog\Commands;
 
 final class Arguments
 {
     private array $arguments = [];
+    
     public function __construct(iterable $arguments)
     {
     foreach ($arguments as $argument => $value) {

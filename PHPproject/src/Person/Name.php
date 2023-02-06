@@ -1,7 +1,5 @@
 <?php
-namespace App\Person;
-
-use App\Person\Name as PersonName;
+namespace GeekBrains\LevelTwo\Person;
 
 class Name
 {

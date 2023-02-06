@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Blog\Repositories\UsersRepository;
+namespace GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository;
 
-use App\Blog\Comment;
-use App\Blog\UUID;
+use GeekBrains\LevelTwo\Blog\Comment;
+use GeekBrains\LevelTwo\Blog\UUID;
 
 interface CommentsRepositoryInterface
 {
