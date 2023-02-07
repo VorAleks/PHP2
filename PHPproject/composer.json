@@ -13,8 +13,8 @@
         }
     ],
     "require": {
-        "symfony/polyfill-uuid": "^1.27"
-        
+        "symfony/polyfill-uuid": "^1.27",
+      "ext-mbstring": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",

@@ -59,6 +59,11 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     }
 
     // Вынесли общую логику в отдельный приватный метод
+
+    /**
+     * @throws UserNotFoundException
+     * @throws \GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException
+     */
     private function getUser(PDOStatement $statement, string $username): User
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
