@@ -2,7 +2,7 @@
 
 namespace GeekBrains\LevelTwo\Blog\Exceptions;
 
-class JsonException extends AppException
+class CommentNotFoundException extends AppException
 {
 
 }

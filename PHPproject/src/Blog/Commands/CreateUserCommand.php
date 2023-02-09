@@ -2,12 +2,12 @@
 
 namespace GeekBrains\LevelTwo\Blog\Commands;
 
-use GeekBrains\LevelTwo\Person\Name;
-use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UserNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\CommandException;
+use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
-use GeekBrains\LevelTwo\Blog\Commands\Arguments;
+use GeekBrains\LevelTwo\Person\Name;
 
 class CreateUserCommand
 {

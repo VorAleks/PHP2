@@ -2,7 +2,7 @@
 
 namespace GeekBrains\LevelTwo\Blog\UnitTests\Repositories\CommentsRepository;
 
-use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\CommentNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\CommentNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Blog\Comment;

@@ -1,6 +1,9 @@
 <?php
+
 namespace GeekBrains\LevelTwo\Blog\UnitTests;
+
 use PHPUnit\Framework\TestCase;
+
 final class HelloTest extends TestCase
 {
 public function testItWorks(): void

@@ -27,6 +27,14 @@ $connection->exec('CREATE TABLE comments (
     text TEXT NOT NULL
     )');
 
+$connection->exec('CREATE TABLE likes_posts (
+    uuid TEXT NOT NULL
+    CONSTRAINT uuid_primary_key PRIMARY KEY,
+    post_uuid TEXT NOT NULL,
+    author_uuid TEXT NOT NULL
+    CONSTRAINT author_uuid_unique_key UNIQUE
+    )');
+
 // //Вставляем строку в таблицу пользователей
 // $connection->exec(
 // "INSERT INTO users (first_name, last_name) VALUES ('Ivan', 'Nikitin')"

@@ -2,6 +2,7 @@
 
 namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
 
+use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Person\Name;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;

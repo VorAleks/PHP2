@@ -1,6 +1,7 @@
 <?php
 namespace GeekBrains\LevelTwo\Blog\Repositories\PostsRepository;
 
+use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
 use GeekBrains\LevelTwo\Blog\Post;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
@@ -49,18 +50,11 @@ class SqlitePostsRepository implements PostsRepositoryInterface
         return $this->getPost($statement, $uuid);
     }
 
-    // public function getByUsername(string $username): User
-    // {
-    //     $statement = $this->connection->prepare(
-    //     'SELECT * FROM users WHERE username = :username'
-    //     );
-    //     $statement->execute([
-    //     ':username' => $username,
-    //     ]);
-    // return $this->getUser($statement, $username);
-    // }
-
     // Вынесли общую логику в отдельный приватный метод
+    /**
+     * @throws PostNotFoundException
+     * @throws \GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException
+     */
     private function getPost(PDOStatement $statement, string $uuid): Post
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);

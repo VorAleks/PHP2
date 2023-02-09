@@ -3,6 +3,7 @@
 namespace GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository;
 
 use GeekBrains\LevelTwo\Blog\Comment;
+use GeekBrains\LevelTwo\Blog\Exceptions\CommentNotFoundException;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
@@ -15,7 +16,6 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
     public function __construct(
     private PDO $connection
     ) {
-        
     }
 
     public function save(Comment $comment): void
@@ -40,6 +40,10 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
 
     // Также добавим метод для получения
     // comment по его UUID
+    /**
+     * @throws CommentNotFoundException
+     * @throws \GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException
+     */
     public function get(UUID $uuid): Comment
     {
         $statement = $this->connection->prepare(
@@ -51,19 +55,12 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
         return $this->getComment($statement, $uuid);
     }
 
-    // public function getByUsername(string $username): User
-    // {
-    //     $statement = $this->connection->prepare(
-    //     'SELECT * FROM users WHERE username = :username'
-    //     );
-    //     $statement->execute([
-    //     ':username' => $username,
-    //     ]);
-    // return $this->getUser($statement, $username);
-    // }
-
     // Вынесли общую логику в отдельный приватный метод
 
+    /**
+     * @throws CommentNotFoundException
+     * @throws \GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException
+     */
     private function getComment(PDOStatement $statement, string $uuid): Comment
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);

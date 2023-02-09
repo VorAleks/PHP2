@@ -1,8 +1,8 @@
 <?php
 
-namespace Actions;
+namespace GeekBrains\LevelTwo\Blog\UnitTests\Actions;
 
-use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UserNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Http\Actions\Users\FindByUsername;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
