@@ -1,9 +1,9 @@
 <?php
-namespace App\Blog\Repositories\UsersRepository;
+namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
 
-use App\Person\Name;
-use App\Blog\User;
-use App\Blog\UUID;
+use GeekBrains\LevelTwo\Person\Name;
+use GeekBrains\LevelTwo\Blog\User;
+use GeekBrains\LevelTwo\Blog\UUID;
 use PDO;
 use PDOStatement;
 
@@ -59,6 +59,11 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     }
 
     // Вынесли общую логику в отдельный приватный метод
+
+    /**
+     * @throws UserNotFoundException
+     * @throws \GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException
+     */
     private function getUser(PDOStatement $statement, string $username): User
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);

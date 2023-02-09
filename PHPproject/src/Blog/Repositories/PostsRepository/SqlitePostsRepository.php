@@ -1,29 +1,27 @@
 <?php
+namespace GeekBrains\LevelTwo\Blog\Repositories\PostsRepository;
 
-namespace App\Blog\Repositories\UsersRepository;
+use GeekBrains\LevelTwo\Blog\Post;
+use GeekBrains\LevelTwo\Blog\UUID;
+use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 
-use App\Blog\Comment;
-use App\Blog\UUID;
-use App\Blog\Repositories\UsersRepository\SqliteUsersRepository;
-use App\Blog\Repositories\UsersRepository\CommentsRepositoryInterface;
 use PDO;
 use PDOStatement;
 
-class SqliteCommentsRepository implements CommentsRepositoryInterface
+class SqlitePostsRepository implements PostsRepositoryInterface
 {
-    
     public function __construct(
     private PDO $connection
     ) {
         
     }
 
-    public function save(Comment $comment): void
+    public function save(Post $post): void
     {
         // Подготавливаем запрос
         $statement = $this->connection->prepare(
-        'INSERT INTO comments (uuid, post_uuid, author_uuid, text)
-        VALUES (:uuid, :post_uuid, :author_uuid, :text)'
+        'INSERT INTO posts (uuid, author_uuid, title, text)
+        VALUES (:uuid, :author_uuid, :title, :text)'
         );
         // Выполняем запрос с конкретными значениями
         $statement->execute([
@@ -31,24 +29,24 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
             // имеет магический метод __toString(),
             // который вызывается, когда объект
             // приводится к строке с помощью (string)
-            ':uuid' =>  (string)$comment->uuid(),
-            ':post_uuid' => (string)$comment->getPost()->uuid(),
-            ':author_uuid' => (string)$comment->getAuthor()->uuid(),
-            ':text' => $comment->getText(),
+            ':uuid' =>  (string)$post->uuid(),
+            ':author_uuid' => $post->getAuthor()->uuid(),
+            ':title' => $post->getTitle(),
+            ':text' => $post->getText(),
         ]);
     }
 
     // Также добавим метод для получения
-    // comment по его UUID
-    public function get(UUID $uuid): Comment
+    // пользователя по его UUID
+    public function get(UUID $uuid): Post
     {
         $statement = $this->connection->prepare(
-        'SELECT * FROM comments WHERE uuid = :uuid'
+        'SELECT * FROM posts WHERE uuid = :uuid'
         );
         $statement->execute([
         ':uuid' => (string)$uuid,
         ]);
-        return $this->getComment($statement, $uuid);
+        return $this->getPost($statement, $uuid);
     }
 
     // public function getByUsername(string $username): User
@@ -63,8 +61,7 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
     // }
 
     // Вынесли общую логику в отдельный приватный метод
-
-    private function getComment(PDOStatement $statement, string $uuid): Comment
+    private function getPost(PDOStatement $statement, string $uuid): Post
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
@@ -74,12 +71,21 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
         }
         // Создаём объект post с uuid
         $userRepository = new SqliteUsersRepository($this->connection);
-        $postRepository = new SqlitePostsRepository($this->connection);
-        return new Comment(
+       return new Post(
         new UUID($result['uuid']),
-        $postRepository->get(new UUID($result['post_uuid'])),
         $userRepository->get(new UUID($result['author_uuid'])),
+        $result['title'],
         $result['text'],
         );
-    }  
+    }
+
+    public function delete(UUID $uuid): void
+    {
+        $statement = $this->connection->prepare(
+            'DELETE FROM posts WHERE posts.uuid=:uuid'
+        );
+        $statement->execute([
+            ':uuid' => (string)$uuid
+        ]);
+    }
 }

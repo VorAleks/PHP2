@@ -6,15 +6,15 @@ use App\Blog\Commands\Arguments;
 use App\Blog\Exceptions\AppException;
 use App\Blog\Commands\CommandException;
 use App\Blog\Commands\CreateUserCommand;
-use App\Blog\UUID;
+use GeekBrains\LevelTwo\Blog\UUID;
 use App\Person\Name;
 use App\Blog\User;
 use App\Blog\Post;
 use App\Blog\Comment;
 use App\Blog\Repositories\UsersRepository\InMemoryUsersRepository;
-use App\Blog\Repositories\UsersRepository\SqlitePostsRepository;
-use App\Blog\Repositories\UsersRepository\SqliteUsersRepository;
-use App\Blog\Repositories\UsersRepository\SqliteCommentsRepository;
+use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
+use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
+use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
 use App\Blog\Repositories\UsersRepository\UserNotFoundException;
 
 // Создаём объект SQLite-репозитория
