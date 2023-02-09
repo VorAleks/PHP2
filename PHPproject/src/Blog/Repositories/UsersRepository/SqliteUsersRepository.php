@@ -1,6 +1,7 @@
 <?php
 namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
 
+use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Person\Name;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
@@ -47,6 +48,9 @@ class SqliteUsersRepository implements UsersRepositoryInterface
         return $this->getUser($statement, $uuid);
     }
 
+    /**
+     * @throws \GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException
+     */
     public function getByUsername(string $username): User
     {
         $statement = $this->connection->prepare(

@@ -1,28 +1,63 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+use GeekBrains\LevelTwo\Blog\Commands\Arguments;
+use GeekBrains\LevelTwo\Blog\Commands\CreateUserCommand;
+use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
 
-use App\Blog\Commands\Arguments;
-use App\Blog\Exceptions\AppException;
-use App\Blog\Commands\CommandException;
-use App\Blog\Commands\CreateUserCommand;
-use GeekBrains\LevelTwo\Blog\UUID;
-use App\Person\Name;
-use App\Blog\User;
-use App\Blog\Post;
-use App\Blog\Comment;
-use App\Blog\Repositories\UsersRepository\InMemoryUsersRepository;
-use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
-use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
-use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
-use App\Blog\Repositories\UsersRepository\UserNotFoundException;
+// Подключаем файл bootstrap.php
+// и получаем настроенный контейнер
+$container = require __DIR__ . '/bootstrap.php';
+
+// При помощи контейнера создаём команду
+$command = $container->get(CreateUserCommand::class);
+try {
+    $command->handle(Arguments::fromArgv($argv));
+} catch (AppException $e) {
+    echo "{$e->getMessage()}\n";
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//require_once __DIR__ . '/vendor/autoload.php';
+//
+//use App\Blog\Commands\CommandException;
+//use GeekBrains\LevelTwo\Blog\UUID;
+//use App\Person\Name;
+//use App\Blog\User;
+//use App\Blog\Post;
+//use App\Blog\Comment;
+//use App\Blog\Repositories\UsersRepository\InMemoryUsersRepository;
+//use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
+//use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
+//use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
+//use App\Blog\Repositories\UsersRepository\UserNotFoundException;
 
 // Создаём объект SQLite-репозитория
 
-$connection =  new PDO('sqlite:' . __DIR__ . '/blog.sqlite');
-$usersRepository = new SqliteUsersRepository($connection);
-$postsRepository = new SqlitePostsRepository($connection);
-$commentsRepository = new SqliteCommentsRepository($connection);
+//$connection =  new PDO('sqlite:' . __DIR__ . '/blog.sqlite');
+//$usersRepository = new SqliteUsersRepository($connection);
+//$postsRepository = new SqlitePostsRepository($connection);
+//$commentsRepository = new SqliteCommentsRepository($connection);
+
 // $command = new CreateUserCommand($usersRepository);
 
 // try {
@@ -44,7 +79,7 @@ $commentsRepository = new SqliteCommentsRepository($connection);
 //     echo "{$e->getMessage()}\n";
 //     }
         
-    $faker = Faker\Factory::create('ru_RU');
+//    $faker = Faker\Factory::create('ru_RU');
 
 // $name = new Name(
 //     $faker->firstName('male'),
@@ -94,9 +129,9 @@ $commentsRepository = new SqliteCommentsRepository($connection);
 //     default:
 //         echo 'No parametr. (user, post, comment)';
 // };
-$id_comment = new UUID('041d76de-15ef-4c56-b0da-c1a2ca644497');
-$id_post = new UUID('fff81673-d726-49e8-b16e-82113319c06c');
-$id_user = new UUID('14504c0d-c9a8-4f9b-996d-3d567f73bc8d');
+//$id_comment = new UUID('041d76de-15ef-4c56-b0da-c1a2ca644497');
+//$id_post = new UUID('fff81673-d726-49e8-b16e-82113319c06c');
+//$id_user = new UUID('14504c0d-c9a8-4f9b-996d-3d567f73bc8d');
 
 // $post = new Post(
 //     UUID::random(),
@@ -116,6 +151,6 @@ $id_user = new UUID('14504c0d-c9a8-4f9b-996d-3d567f73bc8d');
     
     // var_dump($comment->getPost());
 // $commentsRepository->save($comment);
-echo $commentsRepository->get($id_comment);
+//echo $commentsRepository->get($id_comment);
 
 

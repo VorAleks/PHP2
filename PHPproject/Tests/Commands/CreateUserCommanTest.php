@@ -3,14 +3,14 @@
 namespace GeekBrains\LevelTwo\Blog\UnitTests\Commands;
 
 use GeekBrains\LevelTwo\Blog\Commands\Arguments;
-use GeekBrains\LevelTwo\Blog\Commands\ArgumentsException;
-use GeekBrains\LevelTwo\Blog\Commands\CommandException;
 use GeekBrains\LevelTwo\Blog\Commands\CreateUserCommand;
+use GeekBrains\LevelTwo\Blog\Exceptions\ArgumentsException;
+use GeekBrains\LevelTwo\Blog\Exceptions\CommandException;
+use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\DummyUsersRepository;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
-use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UserNotFoundException;
 use PHPUnit\Framework\TestCase;
 
 class CreateUserCommandTest extends TestCase
@@ -32,37 +32,6 @@ class CreateUserCommandTest extends TestCase
     // Запускаем команду с аргументами
     $command->handle(new Arguments(['username' => 'Ivan']));
     }
-
-    // // Тест проверяет, что команда действительно требует имя пользователя
-    // public function testItRequiresFirstName(): void
-    // {
-    // // $usersRepository - это объект анонимного класса,
-    // // реализующего контракт UsersRepositoryInterface
-    // $usersRepository = new class implements UsersRepositoryInterface {
-    // public function save(User $user): void
-    // {
-    // // Ничего не делаем
-    // }
-    // public function get(UUID $uuid): User
-    // {
-    // // И здесь ничего не делаем
-    // throw new UserNotFoundException("Not found");
-    // }
-    // public function getByUsername(string $username): User
-    // {
-    // // И здесь ничего не делаем
-    // throw new UserNotFoundException("Not found");
-    // }
-    // };
-    // // Передаём объект анонимного класса
-    // // в качестве реализации UsersRepositoryInterface
-    // $command = new CreateUserCommand($usersRepository);
-    // // Ожидаем, что будет брошено исключение
-    // $this->expectException(ArgumentsException::class);
-    // $this->expectExceptionMessage('No such argument: first_name');
-    // // Запускаем команду
-    // $command->handle(new Arguments(['username' => 'Ivan']));    
-    // }
 
     // Функция возвращает объект типа UsersRepositoryInterface
     private function makeUsersRepository(): UsersRepositoryInterface

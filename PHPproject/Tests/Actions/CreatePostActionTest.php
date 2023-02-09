@@ -1,10 +1,10 @@
 <?php
 
-namespace Actions;
+namespace GeekBrains\LevelTwo\Blog\UnitTests\Actions;
 
-use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\Post;

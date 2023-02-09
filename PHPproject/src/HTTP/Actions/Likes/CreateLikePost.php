@@ -1,13 +1,14 @@
 <?php
 
-namespace GeekBrains\LevelTwo\Http\Actions\Comments;
+namespace GeekBrains\LevelTwo\Http\Actions\Likes;
 
-use GeekBrains\LevelTwo\Blog\Comment;
+use GeekBrains\LevelTwo\Blog\Exceptions\AuthorDidLikeAlreadyException;
 use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
-use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\CommentsRepositoryInterface;
+use GeekBrains\LevelTwo\Blog\LikePost;
+use GeekBrains\LevelTwo\Blog\Repositories\LikesPostsRepository\LikesPostsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\UUID;
@@ -17,67 +18,57 @@ use GeekBrains\LevelTwo\Http\Request;
 use GeekBrains\LevelTwo\Http\Response;
 use GeekBrains\LevelTwo\Http\SuccessfulResponse;
 
-class CreateComment implements ActionInterface
+class CreateLikePost implements ActionInterface
 {
     public function __construct(
-        private CommentsRepositoryInterface $commentsRepository,
+        private LikesPostsRepositoryInterface $likesPostsRepository,
         private PostsRepositoryInterface $postsRepository,
-        private UsersRepositoryInterface $usersRepository,
+        private UsersRepositoryInterface $usersRepository
     ) {
     }
 
     public function handle(Request $request): Response
     {
-        // Пытаемся создать UUID поста из данных запроса
         try {
             $postUuid = new UUID($request->jsonBodyField('post_uuid'));
         } catch (HttpException | InvalidArgumentException $e) {
             return new ErrorResponse($e->getMessage());
         }
-
-        // Пытаемся найти пост в репозитории
         try {
             $this->postsRepository->get($postUuid);
         } catch (PostNotFoundException $e) {
             return new ErrorResponse($e->getMessage());
         }
-
         try {
             $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
         } catch (HttpException | InvalidArgumentException $e) {
             return new ErrorResponse($e->getMessage());
         }
-
-        // Пытаемся найти пользователя в репозитории
         try {
             $this->usersRepository->get($authorUuid);
         } catch (UserNotFoundException $e) {
             return new ErrorResponse($e->getMessage());
         }
 
-        // Генерируем UUID для новой статьи
-        $newCommentUuid = UUID::random();
+        $newLikePostUuid = UUID::random();
 
         try {
-            // Пытаемся создать объект комментария статьи
-            // из данных запроса
-            $comment = new Comment(
-                $newCommentUuid,
+            $likePost = new LikePost(
+                $newLikePostUuid,
                 $this->postsRepository->get($postUuid),
-                $this->usersRepository->get($authorUuid),
-                $request->jsonBodyField('text'),
+                $this->usersRepository->get($authorUuid)
             );
         } catch (HttpException $e) {
             return new ErrorResponse($e->getMessage());
         }
+        try {
+            $this->likesPostsRepository->save($likePost);
+        } catch (AuthorDidLikeAlreadyException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
 
-        // Сохраняем новую статью в репозитории
-        $this->commentsRepository->save($comment);
-
-        // Возвращаем успешный ответ,
-        // содержащий UUID новой статьи
         return new SuccessfulResponse([
-            'uuid' => (string)$newCommentUuid,
+            'uuid' => (string)$newLikePostUuid,
         ]);
     }
 }
