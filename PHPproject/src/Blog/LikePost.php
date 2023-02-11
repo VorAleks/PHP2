@@ -16,7 +16,7 @@ class LikePost
 
     public function __toString()
     {
-        return $this->getAuthor()->name() . 'поставил лайк посту ' . $this->post->getAuthor()->name();
+        return $this->getAuthor()->name() . ' поставил лайк посту ' . $this->post->getAuthor()->name();
     }
 
     /**

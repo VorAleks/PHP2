@@ -2,14 +2,19 @@
 
 namespace GeekBrains\LevelTwo\Blog\UnitTests\Actions;
 
+use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
+use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
+use GeekBrains\LevelTwo\Blog\UnitTests\DummyLogger;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\Post;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Http\Actions\Posts\CreatePost;
+use GeekBrains\LevelTwo\Http\Auth\AuthException;
+use GeekBrains\LevelTwo\Http\Auth\IdentificationInterface;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\Request;
 use PhpParser\JsonDecoder;
@@ -56,31 +61,24 @@ class CreatePostActionTest extends TestCase
         };
     }
 
-    private function usersRepository(array $users): UsersRepositoryInterface
-    {
-        // В конструктор анонимного класса передаём массив пользователей
-        return new class($users) implements UsersRepositoryInterface {
-            public function __construct(
-                private array $users
-            ) {
-            }
-            public function save(User $user): void
-            {
-            }
-            public function get(UUID $uuid): User
-            {
-                foreach ($this->users as $user) {
-                    if ($user instanceof User && (string)$uuid == $user->uuid())
-                    {
-                        return $user;
-                    }
-                }
-                throw new UserNotFoundException("Can not find user: " . $uuid);
-            }
 
-            public function getByUsername(string $username): User
+
+    private function identification(): IdentificationInterface
+    {
+        return new class() implements IdentificationInterface {
+
+            public function user(Request $request): User
             {
-                throw new UserNotFoundException("Not found");
+                $userUuid = new UUID($request->jsonBodyField('user_uuid'));
+                $user = new User(
+                    new UUID($userUuid),
+                    'username',
+                    new Name('name', 'surname'),
+                );
+                if($userUuid != 'da912a70-5b94-4a63-93d3-783944510017') {
+                   return $user;
+                }
+                throw new UserNotFoundException("Can not find user: " . $userUuid);
             }
         };
     }
@@ -91,19 +89,17 @@ class CreatePostActionTest extends TestCase
      */
     public function testItReturnSuccessfulResponse(): void
     {
-        $request = new Request([], [], '{"author_uuid":"14504c0d-c9a8-4f9b-996d-3d567f73bc8d","title":"some title","text":"some comment"}');
+        $request = new Request([], [], '{"user_uuid":"14504c0d-c9a8-4f9b-996d-3d567f73bc8d","title":"some title","text":"some comment"}');
 
         $postsRepository = $this->postsRepository();
 
-        $usersRepository = $this->usersRepository([
-            new User(
-              new UUID('14504c0d-c9a8-4f9b-996d-3d567f73bc8d'),
-                'username',
-                new Name('name', 'surname'),
-            ),
-        ]);
+        $identification = $this->identification();
 
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost(
+            $postsRepository,
+            $identification,
+            new DummyLogger()
+        );
 
         $response = $action->handle($request);
 
@@ -138,17 +134,22 @@ class CreatePostActionTest extends TestCase
         // Вместо суперглобальных переменных
         // передаём простые массивы
         $request = new Request([], [], '{
-            "author_uuid": "da912a70-5b94-4a63-93d3-error783944510017",
+            "user_uuid": "da912a70-5b94-4a63-93d3-error783944510017",
             "title": "some title",
-            "text": "some comment"
+            "text":"jdfakljflajdflasjflajf"
+            
         }');
 
         // Создаём стаб репозитория пользователей
         $postsRepository = $this->postsRepository();
-        $usersRepository = $this->usersRepository([]);
+        $identification = $this->identification();
 
         //Создаём объект действия
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost(
+            $postsRepository,
+            $identification,
+            new DummyLogger()
+        );
 
         // Запускаем действие
         $response = $action->handle($request);
@@ -170,17 +171,22 @@ class CreatePostActionTest extends TestCase
     public function testItReturnsErrorResponseIfNotFoundUser(): void
     {
         $request = new Request([], [], '{
-            "author_uuid": "da912a70-5b94-4a63-93d3-783944510017",
+            "user_uuid": "da912a70-5b94-4a63-93d3-783944510017",
             "title": "some title",
             "text": "some comment"
         }');
 
         // Создаём стаб репозитория пользователей
         $postsRepository = $this->postsRepository();
-        $usersRepository = $this->usersRepository([]);
+//        $usersRepository = $this->usersRepository([]);
+        $identification = $this->identification();
 
         //Создаём объект действия
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost(
+            $postsRepository,
+            $identification,
+            new DummyLogger()
+        );
 
         // Запускаем действие
         $response = $action->handle($request);
@@ -202,23 +208,21 @@ class CreatePostActionTest extends TestCase
     public function testItReturnsErrorResponseIfNoTitle(): void
     {
         $request = new Request([], [], '{
-            "author_uuid": "da912a70-5b94-4a63-93d3-783944510017",
+            "user_uuid": "14504c0d-c9a8-4f9b-996d-3d567f73bc8d",
 
             "text": "some comment"
         }');
 
         // Создаём стаб репозитория пользователей
         $postsRepository = $this->postsRepository();
-        $usersRepository = $this->usersRepository([
-            new User(
-              new UUID('da912a70-5b94-4a63-93d3-783944510017'),
-                'username',
-                new Name('name', 'surname'),
-            ),
-        ]);
+        $identification = $this->identification();
 
         //Создаём объект действия
-        $action = new CreatePost($postsRepository, $usersRepository);
+        $action = new CreatePost(
+            $postsRepository,
+            $identification,
+            new DummyLogger()
+        );
 
         // Запускаем действие
         $response = $action->handle($request);
@@ -233,4 +237,38 @@ class CreatePostActionTest extends TestCase
         $response->send();
     }
 
+    /**
+     * @runInSeparateProcess
+     * @preserveGlobalState disable
+     */
+    public function testItReturnsErrorResponseIfNoText(): void
+    {
+        $request = new Request([], [], '{
+            "user_uuid": "14504c0d-c9a8-4f9b-996d-3d567f73bc8d",
+            "title": "some title"
+        }');
+
+        // Создаём стаб репозитория пользователей
+        $postsRepository = $this->postsRepository();
+        $identification = $this->identification();
+
+        //Создаём объект действия
+        $action = new CreatePost(
+            $postsRepository,
+            $identification,
+            new DummyLogger()
+        );
+
+        // Запускаем действие
+        $response = $action->handle($request);
+
+        // Проверяем, что ответ - неудачный
+        $this->assertInstanceOf(ErrorResponse::class, $response);
+
+        // Описываем ожидание того, что будет отправлено в поток вывода
+        $this->expectOutputString('{"success":false,"reason":"No such field: text"}');
+
+        // Отправляем ответ в поток вывода
+        $response->send();
+    }
 }

@@ -18,7 +18,7 @@ use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\SuccessfulResponse;
 use PhpParser\JsonDecoder;
 
-class GetByCommentUuid implements \GeekBrains\LevelTwo\Http\Actions\ActionInterface
+class GetLikesByCommentUuid implements \GeekBrains\LevelTwo\Http\Actions\ActionInterface
 {
     public function __construct(
         private LikesCommentsRepositoryInterface $likesCommentsRepository,
@@ -29,7 +29,7 @@ class GetByCommentUuid implements \GeekBrains\LevelTwo\Http\Actions\ActionInterf
     public function handle(Request $request): Response
     {
         try {
-            $commentUuid = new UUID($request->jsonBodyField('comment_uuid'));
+            $commentUuid = new UUID($request->query('uuid'));
         } catch (HttpException | InvalidArgumentException $e) {
             return new ErrorResponse($e->getMessage());
         }
@@ -41,7 +41,7 @@ class GetByCommentUuid implements \GeekBrains\LevelTwo\Http\Actions\ActionInterf
         }
 
         try {
-            $likesList = $this->likesCommentsRepository->getByCommentUuid($commentUuid);
+            $likesList = $this->likesCommentsRepository->getLikesByCommentUuid($commentUuid);
         } catch (LikesForCommentNotFoundException $e) {
             return new ErrorResponse($e->getMessage());
         }

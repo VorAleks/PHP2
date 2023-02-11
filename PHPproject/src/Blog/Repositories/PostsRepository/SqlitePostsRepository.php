@@ -8,11 +8,13 @@ use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
 
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqlitePostsRepository implements PostsRepositoryInterface
 {
     public function __construct(
-    private PDO $connection
+    private PDO $connection,
+    private LoggerInterface $logger
     ) {
         
     }
@@ -24,6 +26,7 @@ class SqlitePostsRepository implements PostsRepositoryInterface
         'INSERT INTO posts (uuid, author_uuid, title, text)
         VALUES (:uuid, :author_uuid, :title, :text)'
         );
+        $newPostUuid = (string)$post->uuid();
         // Выполняем запрос с конкретными значениями
         $statement->execute([
             // Это работает, потому что класс UUID
@@ -35,6 +38,7 @@ class SqlitePostsRepository implements PostsRepositoryInterface
             ':title' => $post->getTitle(),
             ':text' => $post->getText(),
         ]);
+        $this->logger->info("Post created: $newPostUuid");
     }
 
     // Также добавим метод для получения
@@ -59,12 +63,13 @@ class SqlitePostsRepository implements PostsRepositoryInterface
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
+            $this->logger->warning("Cannot find post: $uuid");
             throw new PostNotFoundException(
             "Cannot find post: $uuid"
             );
         }
         // Создаём объект post с uuid
-        $userRepository = new SqliteUsersRepository($this->connection);
+        $userRepository = new SqliteUsersRepository($this->connection, $this->logger);
        return new Post(
         new UUID($result['uuid']),
         $userRepository->get(new UUID($result['author_uuid'])),

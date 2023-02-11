@@ -7,11 +7,13 @@ use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use PDO;
 use PDOStatement;
+use Psr\Log\LoggerInterface;
 
 class SqliteUsersRepository implements UsersRepositoryInterface
 {
     public function __construct(
-    private PDO $connection
+    private PDO $connection,
+    private LoggerInterface $logger
     ) {
     }
 
@@ -22,17 +24,15 @@ class SqliteUsersRepository implements UsersRepositoryInterface
         'INSERT INTO users (uuid, username, first_name, last_name)
         VALUES (:uuid, :username, :first_name, :last_name)'
         );
+        $newUserUuid = (string)$user->uuid();
         // Выполняем запрос с конкретными значениями
         $statement->execute([
-            // Это работает, потому что класс UUID
-            // имеет магический метод __toString(),
-            // который вызывается, когда объект
-            // приводится к строке с помощью (string)
-            ':uuid' =>  (string)$user->uuid(),
+            ':uuid' =>  $newUserUuid,
             ':username' => $user->username(),
             ':first_name' => $user->name()->first(),
             ':last_name' => $user->name()->last(),
         ]);
+        $this->logger->info("User created: $newUserUuid");
     }
 
     // Также добавим метод для получения
@@ -50,6 +50,7 @@ class SqliteUsersRepository implements UsersRepositoryInterface
 
     /**
      * @throws \GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException
+     * @throws UserNotFoundException
      */
     public function getByUsername(string $username): User
     {
@@ -72,10 +73,12 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     {
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
+            $this->logger->warning("Cannot find user: $username");
             throw new UserNotFoundException(
                 "Cannot find user: $username"
             );
         }
+
         // Создаём объект пользователя с полем username
         return new User(
             new UUID($result['uuid']),

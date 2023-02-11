@@ -5,6 +5,7 @@ namespace GeekBrains\LevelTwo\Blog\UnitTests\Repositories\PostsRepository;
 use GeekBrains\LevelTwo\Blog\Exceptions\PostNotFoundException;
 use GeekBrains\LevelTwo\Blog\Post;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\SqlitePostsRepository;
+use GeekBrains\LevelTwo\Blog\UnitTests\DummyLogger;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Person\Name;
@@ -36,7 +37,7 @@ class SqlitePostsRepositoryTest extends TestCase
             // возвращает мок запроса
             $connectionStub->method('prepare')->willReturn($statementMock);
             // 5. Передаём в репозиторий стаб подключения
-            $repository = new SqlitePostsRepository($connectionStub);
+            $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
             // 6. Вызываем метод сохранения пользователя
             $repository->save(
             new Post ( // Свойства пользователя точно такие,
@@ -65,12 +66,12 @@ class SqlitePostsRepositoryTest extends TestCase
                 'text' => 'text',
                 'username' => 'user',
                 'first_name' => 'first',
-                'last_name' => 'last'
-            ]);
+                'last_name' => 'last',
+            ] );
 
             $connectionStub->method('prepare')->willReturn($statementStub);
            
-            $postRepository = new SqlitePostsRepository($connectionStub);
+            $postRepository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
             $post = $postRepository->get(new UUID('d550d5d7-4ad2-4ee9-8709-19b8a556b66d'));
 
@@ -85,7 +86,7 @@ class SqlitePostsRepositoryTest extends TestCase
             $statementStub->method('fetch')->willReturn(false);
             $connectionStub->method('prepare')->willReturn($statementStub);
 
-            $repository = new SqlitePostsRepository($connectionStub);
+            $repository = new SqlitePostsRepository($connectionStub, new DummyLogger());
 
             $this->expectException(PostNotFoundException::class);
             $this->expectExceptionMessage('Cannot find post: b7276e35-4280-421f-9fef-f5251f89b8ad');

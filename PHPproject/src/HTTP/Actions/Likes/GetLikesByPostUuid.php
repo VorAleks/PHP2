@@ -15,7 +15,7 @@ use GeekBrains\LevelTwo\Http\Response;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\SuccessfulResponse;
 
-class GetByPostUuid implements ActionInterface
+class GetLikesByPostUuid implements ActionInterface
 {
 
     public function __construct(
@@ -27,7 +27,7 @@ class GetByPostUuid implements ActionInterface
     public function handle(Request $request): Response
     {
         try {
-            $postUuid = new UUID($request->jsonBodyField('post_uuid'));
+            $postUuid = new UUID($request->query('uuid'));
         } catch (HttpException | InvalidArgumentException $e) {
             return new ErrorResponse($e->getMessage());
         }
@@ -40,7 +40,7 @@ class GetByPostUuid implements ActionInterface
 
 
         try {
-            $likesList = $this->likesPostsRepository->getByPostUuid($postUuid);
+            $likesList = $this->likesPostsRepository->getLikesByPostUuid($postUuid);
         } catch (LikesForPostNotFoundException $e) {
             return new ErrorResponse($e->getMessage());
         }
