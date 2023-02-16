@@ -1,10 +1,6 @@
-/vendor
+/vendor/
 .idea
 .phpunit.result.cache
-coverage_report/
 .env
-/PHPproject/vendor
-/PHPproject/.phpunit.result.cache
-/PHPproject/.idea
-/PHPproject/coverage_report/
-/PHPproject/.env
+.phpunit.result.cache
+/coverage_report/
