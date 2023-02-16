@@ -3,16 +3,28 @@
 use GeekBrains\LevelTwo\Blog\Commands\Arguments;
 use GeekBrains\LevelTwo\Blog\Commands\CreateUserCommand;
 use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
+use GeekBrains\LevelTwo\Blog\Repositories\LikesPostsRepository\LikesPostsRepositoryInterface;
+use GeekBrains\LevelTwo\Blog\UUID;
+use Psr\Log\LoggerInterface;
 
 // Подключаем файл bootstrap.php
 // и получаем настроенный контейнер
 $container = require __DIR__ . '/bootstrap.php';
-
-// При помощи контейнера создаём команду
-$command = $container->get(CreateUserCommand::class);
+$logger = $container->get(LoggerInterface::class);
 try {
+
+//    $likesPostsRepository = $container->get(LikesPostsRepositoryInterface::class);
+//
+//    $likesPosts = $likesPostsRepository->getByPostUuid(new UUID('aa53f72e-3ade-43ad-adb0-ac57c12865b2'));
+//    print_r($likesPosts);
+//
+//    die();
+
+    // При помощи контейнера создаём команду
+    $command = $container->get(CreateUserCommand::class);
     $command->handle(Arguments::fromArgv($argv));
 } catch (AppException $e) {
+//    $logger->error($e->getMessage(), ['exception' => $e]);
     echo "{$e->getMessage()}\n";
 }
 

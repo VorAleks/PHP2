@@ -8,5 +8,6 @@ use GeekBrains\LevelTwo\Blog\UUID;
 interface LikesPostsRepositoryInterface
 {
     public function save(likePost $like): void;
-    public function getByPostUuid(UUID $uuid): array;
+    public function get(UUID $uuid): LikePost;
+    public function getLikesByPostUuid(UUID $uuid): array;
 }

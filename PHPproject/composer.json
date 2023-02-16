@@ -18,9 +18,12 @@
         }
     ],
     "require": {
+        "ext-pdo": "*",
         "symfony/polyfill-uuid": "^1.27",
-      "ext-mbstring": "*",
-        "psr/container": "^2.0"
+        "ext-mbstring": "*",
+        "psr/container": "^2.0",
+        "monolog/monolog": "^2.9",
+        "vlucas/phpdotenv": "^5.5"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
@@ -29,7 +32,8 @@
     },
 
     "scripts": {
-        "test": "phpunit tests --testdox --colors"
+        "test": "phpunit tests --testdox --colors",
+        "serv": "php -S localhost:80 http.php"
         }
         
 }

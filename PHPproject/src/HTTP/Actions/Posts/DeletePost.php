@@ -10,11 +10,13 @@ use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\Request;
 use GeekBrains\LevelTwo\Http\Response;
 use GeekBrains\LevelTwo\Http\SuccessfulResponse;
+use Psr\Log\LoggerInterface;
 
 class DeletePost implements ActionInterface
 {
     public function __construct(
-        private PostsRepositoryInterface $postsRepository
+        private PostsRepositoryInterface $postsRepository,
+        private LoggerInterface $logger
     ){
     }
 
@@ -28,6 +30,8 @@ class DeletePost implements ActionInterface
         }
 
         $this->postsRepository->delete(new UUID($postUuid));
+
+        $this->logger->info("Post deleted: $postUuid");
 
         return new SuccessfulResponse([
             'uuid' => $postUuid

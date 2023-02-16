@@ -2,20 +2,28 @@
 
 use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
 use GeekBrains\LevelTwo\Http\Actions\Comments\CreateComment;
+use GeekBrains\LevelTwo\Http\Actions\Comments\GetCommentByUuid;
 use GeekBrains\LevelTwo\Http\Actions\Likes\CreateLikeComment;
 use GeekBrains\LevelTwo\Http\Actions\Likes\CreateLikePost;
-use GeekBrains\LevelTwo\Http\Actions\Likes\GetByCommentUuid;
-use GeekBrains\LevelTwo\Http\Actions\Likes\GetByPostUuid;
+use GeekBrains\LevelTwo\Http\Actions\Likes\GetLikeCommentByUuid;
+use GeekBrains\LevelTwo\Http\Actions\Likes\GetLikePostByUuid;
+use GeekBrains\LevelTwo\Http\Actions\Likes\GetLikesByCommentUuid;
+use GeekBrains\LevelTwo\Http\Actions\Likes\GetLikesByPostUuid;
+use GeekBrains\LevelTwo\Http\Actions\Posts\GetPostByUuid;
+use GeekBrains\LevelTwo\Http\Actions\Users\CreateUser;
 use GeekBrains\LevelTwo\Http\Request;
 use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\Actions\Users\FindByUsername;
 use GeekBrains\LevelTwo\Http\Actions\Posts\CreatePost;
 use GeekBrains\LevelTwo\Http\Actions\Posts\DeletePost;
+use Psr\Log\LoggerInterface;
 
 // Подключаем файл bootstrap.php
 // и получаем настроенный контейнер
 $container = require __DIR__ . '/bootstrap.php';
+
+$logger = $container->get(LoggerInterface::class);
 
 $request = new Request(
     $_GET,
@@ -24,13 +32,15 @@ $request = new Request(
 );
 try {
     $path = $request->path();
-} catch (HttpException) {
+} catch (HttpException $e) {
+    $logger->warning($e->getMessage());
     (new ErrorResponse)->send();
     return;
 }
 try {
     $method = $request->method();
-} catch (HttpException) {
+} catch (HttpException $e) {
+    $logger->warning($e->getMessage());
     (new ErrorResponse)->send();
     return;
 }
@@ -39,15 +49,19 @@ try {
 $routes = [
     'GET' => [
         '/users/show' => FindByUsername::class,
-//        '/posts/show' => FindByUuid::class,
-        '/likesposts/show' => GetByPostUuid::class,
-        '/likescomments/show' => GetByCommentUuid::class,
+        '/posts/show' => GetPostByUuid::class,
+        '/comments/show' => GetCommentByUuid::class,
+        '/likes-posts/show/like' => GetLikePostByUuid::class,
+        '/likes-posts/show/list' => GetLikesByPostUuid::class,
+        '/likes-comments/show/like' => GetLikeCommentByUuid::class,
+        '/likes-comments/show/list' => GetLikesByCommentUuid::class,
     ],
     'POST' => [
+        '/users/create' => CreateUser::class,
         '/posts/create' => CreatePost::class,
         '/comments/create' => CreateComment::class,
-        '/likesposts/create' => CreateLikePost::class,
-        '/likescomments/create' => CreateLikeComment::class,
+        '/likes-posts/create' => CreateLikePost::class,
+        '/likes-comments/create' => CreateLikeComment::class,
     ],
 
     'DELETE' => [
@@ -55,25 +69,29 @@ $routes = [
     ],
 ];
 
-if (!array_key_exists($method, $routes)) {
+if (!array_key_exists($method, $routes)
+    || !array_key_exists($path, $routes[$method])) {
+    $message = "Route not found: $method $path";
+    $logger->notice($message);
     (new ErrorResponse("Route not found: $method $path"))->send();
     return;
 }
-if (!array_key_exists($path, $routes[$method])) {
-    (new ErrorResponse("Route not found: $method $path"))->send();
-    return;
-}
+
 // Получаем имя класса действия для маршрута
 $actionClassName = $routes[$method][$path];
-// С помощью контейнера
-// создаём объект нужного действия
-$action = $container->get($actionClassName);
 
 try {
+    // С помощью контейнера
+    // создаём объект нужного действия
+    $action = $container->get($actionClassName);
     $response = $action->handle($request);
 } catch (AppException $e) {
-    (new ErrorResponse($e->getMessage()))->send();
+    //Logging message with ERROR level
+    $logger->error($e->getMessage(), ['exception' => $e]);
+    //Dont sent error message to user, only logging
+    (new ErrorResponse)->send();
 }
+
 $response->send();
 
 

@@ -4,6 +4,7 @@ namespace GeekBrains\LevelTwo\Blog\UnitTests\Repositories\CommentsRepository;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\CommentNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\SqliteCommentsRepository;
+use GeekBrains\LevelTwo\Blog\UnitTests\DummyLogger;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Blog\Comment;
 use GeekBrains\LevelTwo\Blog\Post;
@@ -37,7 +38,7 @@ class SqliteCommentsRepositoryTest extends TestCase
         // возвращает мок запроса
         $connectionStub->method('prepare')->willReturn($statementMock);
         // 5. Передаём в репозиторий стаб подключения
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
         // 6. Вызываем метод сохранения пользователя
         $repository->save(
             new Comment ( // Свойства пользователя точно такие,
@@ -84,7 +85,7 @@ class SqliteCommentsRepositoryTest extends TestCase
         ]);
 
         $connectionStub->method('prepare')->willReturn($statementStub);
-        $commentRepository = new SqliteCommentsRepository($connectionStub);
+        $commentRepository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $comment = $commentRepository->get(new UUID('df79ee08-81cc-4068-b7cb-cb445449910d'));
         $this->assertSame('df79ee08-81cc-4068-b7cb-cb445449910d', (string)$comment->uuid());
@@ -98,7 +99,7 @@ class SqliteCommentsRepositoryTest extends TestCase
         $statementStub->method('fetch')->willReturn(false);
         $connectionStub->method('prepare')->willReturn($statementStub);
 
-        $repository = new SqliteCommentsRepository($connectionStub);
+        $repository = new SqliteCommentsRepository($connectionStub, new DummyLogger());
 
         $this->expectException(CommentNotFoundException::class);
         $this->expectExceptionMessage('Cannot find comment: 123e4567-e89b-12d3-a456-426614174000');

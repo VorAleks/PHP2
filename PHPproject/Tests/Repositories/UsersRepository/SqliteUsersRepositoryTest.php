@@ -4,6 +4,7 @@ namespace GeekBrains\LevelTwo;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\SqliteUsersRepository;
+use GeekBrains\LevelTwo\Blog\UnitTests\DummyLogger;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Person\Name;
@@ -29,7 +30,7 @@ class SqliteUsersRepositoryTest extends TestCase
         // стаб запроса - при вызове метода prepare
         $connectionMock->method('prepare')->willReturn($statementStub);
         // 1. Передаём в репозиторий стаб подключения
-        $repository = new SqliteUsersRepository($connectionMock);
+        $repository = new SqliteUsersRepository($connectionMock, new DummyLogger());
         // Ожидаем, что будет брошено исключение
         $this->expectException(UserNotFoundException::class);
         $this->expectExceptionMessage('Cannot find user: Ivan');
@@ -59,7 +60,7 @@ class SqliteUsersRepositoryTest extends TestCase
         // возвращает мок запроса
         $connectionStub->method('prepare')->willReturn($statementMock);
         // 5. Передаём в репозиторий стаб подключения
-        $repository = new SqliteUsersRepository($connectionStub);
+        $repository = new SqliteUsersRepository($connectionStub, new DummyLogger());
         // 6. Вызываем метод сохранения пользователя
         $repository->save(
         new User( // Свойства пользователя точно такие,
@@ -85,7 +86,7 @@ class SqliteUsersRepositoryTest extends TestCase
 
             $connectionStub->method('prepare')->willReturn($statementStub);
            
-            $userRepository = new SqliteUsersRepository($connectionStub);
+            $userRepository = new SqliteUsersRepository($connectionStub, new DummyLogger());
 
             $user = $userRepository->get(new UUID('9fd67cb4-ea95-4f32-aa23-e6686928ce5e'));
 
