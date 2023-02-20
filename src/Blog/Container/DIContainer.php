@@ -24,6 +24,7 @@ class DIContainer implements ContainerInterface
 
     /**
      * @throws NotFoundException
+     * @throws \ReflectionException
      */
     public function get(string $type): object
     {

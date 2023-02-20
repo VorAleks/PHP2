@@ -2,6 +2,7 @@
 
 use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
 use GeekBrains\LevelTwo\Http\Actions\Auth\LogIn;
+use GeekBrains\LevelTwo\Http\Actions\Auth\LogOut;
 use GeekBrains\LevelTwo\Http\Actions\Comments\CreateComment;
 use GeekBrains\LevelTwo\Http\Actions\Comments\GetCommentByUuid;
 use GeekBrains\LevelTwo\Http\Actions\Likes\CreateLikeComment;
@@ -58,8 +59,8 @@ $routes = [
         '/likes-comments/show/list' => GetLikesByCommentUuid::class,
     ],
     'POST' => [
-        // Добавили маршрут обмена пароля на токен
         '/login' => LogIn::class,
+        '/logout' => LogOut::class,
         '/users/create' => CreateUser::class,
         '/posts/create' => CreatePost::class,
         '/comments/create' => CreateComment::class,

@@ -32,7 +32,6 @@ $connection->exec('CREATE TABLE likes_posts (
     CONSTRAINT uuid_primary_key PRIMARY KEY,
     post_uuid TEXT NOT NULL,
     author_uuid TEXT NOT NULL
-    CONSTRAINT author_uuid_unique_key UNIQUE
     )');
 
 // //Вставляем строку в таблицу пользователей

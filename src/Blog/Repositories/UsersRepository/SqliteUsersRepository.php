@@ -1,4 +1,5 @@
 <?php
+
 namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
@@ -50,10 +51,11 @@ class SqliteUsersRepository implements UsersRepositoryInterface
         $statement = $this->connection->prepare(
         'SELECT * FROM users WHERE uuid = :uuid'
         );
+        $stringUuid = (string)$uuid;
         $statement->execute([
-        ':uuid' => (string)$uuid,
+        ':uuid' => $stringUuid,
         ]);
-        return $this->getUser($statement, $uuid);
+        return $this->getUser($statement, $stringUuid);
     }
 
     /**
