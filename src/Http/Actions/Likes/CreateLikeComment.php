@@ -2,6 +2,7 @@
 
 namespace GeekBrains\LevelTwo\Http\Actions\Likes;
 
+use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
 use GeekBrains\LevelTwo\Blog\Exceptions\AuthorDidLikeAlreadyException;
 use GeekBrains\LevelTwo\Blog\Exceptions\CommentNotFoundException;
 use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
@@ -12,6 +13,7 @@ use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\CommentsRepositoryI
 use GeekBrains\LevelTwo\Blog\Repositories\LikesCommentsRepository\LikesCommentsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\UUID;
+use GeekBrains\LevelTwo\Http\Auth\TokenAuthenticationInterface;
 use GeekBrains\LevelTwo\Http\Request;
 use GeekBrains\LevelTwo\Http\Response;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
@@ -22,12 +24,30 @@ class CreateLikeComment implements \GeekBrains\LevelTwo\Http\Actions\ActionInter
     public function __construct(
         private LikesCommentsRepositoryInterface $likesCommentsRepository,
         private CommentsRepositoryInterface $commentsRepository,
-        private UsersRepositoryInterface $usersRepository
+//        private UsersRepositoryInterface $usersRepository
+        // Аутентификация по токену
+        private TokenAuthenticationInterface $authentication,
     ) {
     }
 
     public function handle(Request $request): Response
     {
+        try {
+            $author = $this->authentication->user($request);
+        } catch (AppException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+//        try {
+//            $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
+//        } catch (HttpException | InvalidArgumentException $e) {
+//            return new ErrorResponse($e->getMessage());
+//        }
+//        try {
+//            $this->usersRepository->get($authorUuid);
+//        } catch (UserNotFoundException $e) {
+//            return new ErrorResponse($e->getMessage());
+//        }
+
         try {
             $commentUuid = new UUID($request->jsonBodyField('comment_uuid'));
         } catch (HttpException | InvalidArgumentException $e) {
@@ -38,16 +58,6 @@ class CreateLikeComment implements \GeekBrains\LevelTwo\Http\Actions\ActionInter
         } catch (CommentNotFoundException $e) {
             return new ErrorResponse($e->getMessage());
         }
-        try {
-            $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
-        } catch (HttpException | InvalidArgumentException $e) {
-            return new ErrorResponse($e->getMessage());
-        }
-        try {
-            $this->usersRepository->get($authorUuid);
-        } catch (UserNotFoundException $e) {
-            return new ErrorResponse($e->getMessage());
-        }
 
         $newLikeCommentUuid = UUID::random();
 
@@ -55,7 +65,7 @@ class CreateLikeComment implements \GeekBrains\LevelTwo\Http\Actions\ActionInter
             $likeComment = new LikeComment(
                 $newLikeCommentUuid,
                 $this->commentsRepository->get($commentUuid),
-                $this->usersRepository->get($authorUuid)
+                $author
             );
         } catch (HttpException $e) {
             return new ErrorResponse($e->getMessage());

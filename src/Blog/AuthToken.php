@@ -28,6 +28,11 @@ class AuthToken
     {
         return $this->expiresOn;
     }
+    // прописываем в токен текущую дату
+    public function expiresOff(): void
+    {
+        $this->expiresOn = new DateTimeImmutable();
+    }
 
     public function __toString(): string
     {

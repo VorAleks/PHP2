@@ -4,6 +4,7 @@ namespace GeekBrains\LevelTwo\Http\Actions\Posts;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
 use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
+use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Post;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\UUID;
@@ -23,6 +24,9 @@ class CreatePost implements ActionInterface
     ) {
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function handle(Request $request): Response
     {
         // Обрабатываем ошибки аутентификации
