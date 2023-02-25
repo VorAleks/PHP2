@@ -31,10 +31,13 @@ class SqliteLikesCommentsRepository implements LikesCommentsRepositoryInterface
     public function save(LikeComment $like): void
     {
         $statement = $this->connection->prepare(
-            'SELECT * FROM likes_comments WHERE author_uuid = :author_uuid'
+            'SELECT * FROM likes_comments 
+                    WHERE author_uuid = :author_uuid
+                    AND comment_uuid = :comment_uuid'
         );
         $statement->execute([
             ':author_uuid' => (string)$like->getAuthor()->uuid(),
+            ':comment_uuid' => (string)$like->getComment()->uuid(),
         ]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {

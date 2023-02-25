@@ -30,10 +30,13 @@ class SqliteLikesPostsRepository implements LikesPostsRepositoryInterface
     public function save(LikePost $like): void
     {
         $statement = $this->connection->prepare(
-            'SELECT * FROM likes_posts WHERE author_uuid = :author_uuid'
+            'SELECT * FROM likes_posts
+                    WHERE author_uuid = :author_uuid
+                    AND post_uuid = :post_uuid'
         );
         $statement->execute([
             ':author_uuid' => (string)$like->getAuthor()->uuid(),
+            ':post_uuid' => (string)$like->getPost()->uuid()
         ]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {

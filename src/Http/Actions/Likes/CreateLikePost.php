@@ -2,6 +2,7 @@
 
 namespace GeekBrains\LevelTwo\Http\Actions\Likes;
 
+use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
 use GeekBrains\LevelTwo\Blog\Exceptions\AuthorDidLikeAlreadyException;
 use GeekBrains\LevelTwo\Blog\Exceptions\HttpException;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
@@ -13,6 +14,7 @@ use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterfa
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Http\Actions\ActionInterface;
+use GeekBrains\LevelTwo\Http\Auth\TokenAuthenticationInterface;
 use GeekBrains\LevelTwo\Http\ErrorResponse;
 use GeekBrains\LevelTwo\Http\Request;
 use GeekBrains\LevelTwo\Http\Response;
@@ -23,12 +25,30 @@ class CreateLikePost implements ActionInterface
     public function __construct(
         private LikesPostsRepositoryInterface $likesPostsRepository,
         private PostsRepositoryInterface $postsRepository,
-        private UsersRepositoryInterface $usersRepository
+//        private UsersRepositoryInterface $usersRepository
+        // Аутентификация по токену
+        private TokenAuthenticationInterface $authentication,
     ) {
     }
 
     public function handle(Request $request): Response
     {
+        try {
+            $author = $this->authentication->user($request);
+        } catch (AppException $e) {
+            return new ErrorResponse($e->getMessage());
+        }
+//        try {
+//            $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
+//        } catch (HttpException | InvalidArgumentException $e) {
+//            return new ErrorResponse($e->getMessage());
+//        }
+//        try {
+//            $this->usersRepository->get($authorUuid);
+//        } catch (UserNotFoundException $e) {
+//            return new ErrorResponse($e->getMessage());
+//        }
+
         try {
             $postUuid = new UUID($request->jsonBodyField('post_uuid'));
         } catch (HttpException | InvalidArgumentException $e) {
@@ -39,16 +59,6 @@ class CreateLikePost implements ActionInterface
         } catch (PostNotFoundException $e) {
             return new ErrorResponse($e->getMessage());
         }
-        try {
-            $authorUuid = new UUID($request->jsonBodyField('author_uuid'));
-        } catch (HttpException | InvalidArgumentException $e) {
-            return new ErrorResponse($e->getMessage());
-        }
-        try {
-            $this->usersRepository->get($authorUuid);
-        } catch (UserNotFoundException $e) {
-            return new ErrorResponse($e->getMessage());
-        }
 
         $newLikePostUuid = UUID::random();
 
@@ -56,7 +66,7 @@ class CreateLikePost implements ActionInterface
             $likePost = new LikePost(
                 $newLikePostUuid,
                 $this->postsRepository->get($postUuid),
-                $this->usersRepository->get($authorUuid)
+                $author
             );
         } catch (HttpException $e) {
             return new ErrorResponse($e->getMessage());
