@@ -40,10 +40,18 @@ class SqliteLikesPostsRepository implements LikesPostsRepositoryInterface
         ]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
-            $statement = $this->connection->prepare(
-                'INSERT INTO likes_posts (uuid, post_uuid, author_uuid)
-        VALUES (:uuid, :post_uuid, :author_uuid)'
-            );
+            $query = "
+                INSERT INTO likes_posts (
+                    uuid,
+                    post_uuid,
+                    author_uuid
+                ) VALUES (
+                    :uuid,
+                    :post_uuid,
+                    :author_uuid
+                )
+            ";
+            $statement = $this->connection->prepare($query);
             $newLikePostUuid = (string)$like->uuid();
             $statement->execute([
                 ':uuid' =>  (string)$like->uuid(),

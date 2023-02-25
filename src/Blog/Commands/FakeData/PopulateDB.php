@@ -2,9 +2,11 @@
 
 
 namespace GeekBrains\LevelTwo\Blog\Commands\FakeData;
+use GeekBrains\LevelTwo\Blog\Comment;
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Repositories\PostsRepository\PostsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
+use GeekBrains\LevelTwo\Blog\Repositories\CommentsRepository\CommentsRepositoryInterface;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use GeekBrains\LevelTwo\Person\Name;
@@ -22,6 +24,7 @@ class PopulateDB extends Command
         private \Faker\Generator $faker,
         private UsersRepositoryInterface $usersRepository,
         private PostsRepositoryInterface $postsRepository,
+        private CommentsRepositoryInterface $commentsRepository,
     ) {
         parent::__construct();
     }
@@ -38,15 +41,20 @@ class PopulateDB extends Command
                 // Опция имеет значения
                 InputOption::VALUE_OPTIONAL,
                 // Описание
-                'Number of users',
+                'Users count',
             )
             ->addOption(
                 'posts-number',
                 'p',
                 InputOption::VALUE_OPTIONAL,
-                'Numbers of posts',
+                'Posts count for each user',
             )
-        ;
+            ->addOption(
+                'comments-number',
+                'c',
+                InputOption::VALUE_OPTIONAL,
+                'Comments count for each post',
+            );
     }
 
     /**
@@ -56,19 +64,40 @@ class PopulateDB extends Command
         InputInterface $input,
         OutputInterface $output,
     ): int {
-    // Создаём десять пользователей
+        $usersNumber = $input->getOption('users-number');
+        $postsNumber = $input->getOption('posts-number');
+        $commentsNumber = $input->getOption('comments-number');
+        if (empty($usersNumber)) {
+            $usersNumber = 10;
+        }
+        if (empty($postsNumber)) {
+            $postsNumber = 20;
+        }
+        if (empty($commentsNumber)) {
+            $commentsNumber = 5;
+        }
         $users = [];
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < $usersNumber; $i++) {
             $user = $this->createFakeUser();
             $users[] = $user;
             $output->writeln('User created: ' . $user->username());
         }
-    // От имени каждого пользователя
-    // создаём по двадцать статей
         foreach ($users as $user) {
-            for ($i = 0; $i < 20; $i++) {
+            $commentAuthors = $users;
+            if (count($commentAuthors) != 1) {
+                if(($key = array_search($user, $commentAuthors)) !== false){
+                    array_splice($commentAuthors, $key, 1);
+                }
+            }
+
+            for ($i = 0; $i < $postsNumber; $i++) {
                 $post = $this->createFakePost($user);
                 $output->writeln('Post created: ' . $post->getTitle());
+                for ($j = 0; $j < $commentsNumber; $j++) {
+                    $indexRandomAuthor = array_rand($commentAuthors);
+                    $comment = $this->createFakeComment($post, $commentAuthors[$indexRandomAuthor]);
+                    $output->writeln('Comment created: ' . $comment->getAuthor()->name()->last());
+                }
             }
         }
         return Command::SUCCESS;
@@ -112,5 +141,21 @@ class PopulateDB extends Command
         // Сохраняем статью в репозиторий
         $this->postsRepository->save($post);
         return $post;
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function createFakeComment(Post $post, User $author): Comment
+    {
+        $comment = new Comment(
+            UUID::random(),
+            $post,
+            $author,
+            $this->faker->realText
+        );
+        // Сохраняем статью в репозиторий
+        $this->commentsRepository->save($comment);
+        return $comment;
     }
 }
