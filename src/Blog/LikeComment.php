@@ -16,7 +16,9 @@ class LikeComment
 
     #[Pure] public function __toString()
     {
-        return $this->getAuthor()->name() . ' поставил лайк комменту ' . $this->comment->getAuthor()->name();
+        return $this->getAuthor()->name()
+            . ' поставил лайк комменту '
+            . $this->comment->getAuthor()->name();
     }
 
     /**

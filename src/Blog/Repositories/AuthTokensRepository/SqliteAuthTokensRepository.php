@@ -35,7 +35,7 @@ class SqliteAuthTokensRepository implements AuthTokensRepositoryInterface
             )
             ON CONFLICT (token) DO UPDATE SET
                 expires_on = :expires_on
-            ";
+        ";
 
         try {
             $statement = $this->connection->prepare($query);

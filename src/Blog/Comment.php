@@ -16,7 +16,8 @@ class Comment
     public function __toString()
     {
     return $this->post . PHP_EOL 
-        . ' was commented by ' . $this->author . PHP_EOL
+        . ' was commented by '
+        . $this->author . PHP_EOL
         . $this->text;
     }
     /**
