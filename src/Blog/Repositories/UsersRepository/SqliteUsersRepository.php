@@ -4,10 +4,12 @@ namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
+use GeekBrains\LevelTwo\Blog\Exceptions\UsersRepositoryException;
 use GeekBrains\LevelTwo\Person\Name;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;
 use PDO;
+use PDOException;
 use PDOStatement;
 use Psr\Log\LoggerInterface;
 
@@ -19,29 +21,47 @@ class SqliteUsersRepository implements UsersRepositoryInterface
     ) {
     }
 
+    /**
+     * @throws UsersRepositoryException
+     */
     public function save(User $user): void
     {
-        // Добавили поле password в запрос
-        $statement = $this->connection->prepare(
-            'INSERT INTO users
-        (uuid, username, password, first_name, last_name)
-        VALUES
-        (:uuid, :username, :password, :first_name, :last_name)'
-        );
-        $newUserUuid = (string)$user->uuid();
-        $statement->execute([
-            ':uuid' => $newUserUuid,
-            ':username' => $user->username(),
-            // Значения для поля password
-            ':password' => $user->hashedPassword(),
-            ':first_name' => $user->name()->first(),
-            ':last_name' => $user->name()->last(),
-        ]);
-        $this->logger->info("User created: $newUserUuid");
+        $query = "
+            INSERT INTO users(
+                uuid,
+                username,
+                password,
+                first_name,
+                last_name
+            ) VALUES (
+                :uuid,
+                :username,
+                :password,
+                :first_name,
+                :last_name
+            ) 
+            ON CONFLICT (uuid) DO UPDATE SET
+                first_name = :first_name,
+                last_name = :last_name
+        ";
+        try {
+            $statement = $this->connection->prepare($query);
+            $newUserUuid = (string)$user->uuid();
+            $statement->execute([
+                ':uuid' => $newUserUuid,
+                ':username' => $user->username(),
+                ':password' => $user->hashedPassword(),
+                ':first_name' => $user->name()->first(),
+                ':last_name' => $user->name()->last(),
+            ]);
+            $this->logger->info("User created: $newUserUuid");
+        } catch (PDOException $e) {
+            throw new UsersRepositoryException(
+                $e->getMessage(), (int)$e->getCode(), $e
+            );
+        }
     }
 
-    // Также добавим метод для получения
-    // пользователя по его UUID
     /**
      * @throws UserNotFoundException
      * @throws InvalidArgumentException
@@ -87,7 +107,6 @@ class SqliteUsersRepository implements UsersRepositoryInterface
             );
         }
 
-        // Создаём объект пользователя с полем password
         return new User(
             new UUID($result['uuid']),
             $result['username'],

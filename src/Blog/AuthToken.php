@@ -15,20 +15,31 @@ class AuthToken
         private DateTimeImmutable $expiresOn
     ) {
     }
-
+    /**
+     * Get the value of token
+     */
     public function token(): string
     {
         return $this->token;
     }
+    /**
+     * Get the value of userUuid
+     */
     public function userUuid(): UUID
     {
         return $this->userUuid;
     }
+    /**
+     * Get the value of expiresOn
+     */
     public function expiresOn(): DateTimeImmutable
     {
         return $this->expiresOn;
     }
-    // прописываем в токен текущую дату
+
+    /**
+     * Set the value of expiresOn as current date
+     */
     public function expiresOff(): void
     {
         $this->expiresOn = new DateTimeImmutable();

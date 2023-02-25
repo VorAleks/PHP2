@@ -1,4 +1,5 @@
 <?php
+
 namespace GeekBrains\LevelTwo\Person;
 
 class Name
@@ -13,7 +14,6 @@ class Name
     {
     return $this->firstName . ' ' . $this->lastName;
     }
-    
 
     /**
      * Get the value of firstName
@@ -26,8 +26,9 @@ class Name
     /**
      * Set the value of firstName
      *
+     * @param String $firstName
      * @return  self
-     */ 
+     */
     public function setFirstName(String $firstName): Name
     {
         $this->firstName = $firstName;
@@ -46,8 +47,9 @@ class Name
     /**
      * Set the value of lastName
      *
+     * @param String $lastName
      * @return  self
-     */ 
+     */
     public function setLastName(String $lastName): Name
     {
         $this->lastName = $lastName;

@@ -1,17 +1,61 @@
 <?php
 
-use GeekBrains\LevelTwo\Blog\Commands\Arguments;
-use GeekBrains\LevelTwo\Blog\Commands\CreateUserCommand;
-use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
-use GeekBrains\LevelTwo\Blog\Repositories\LikesPostsRepository\LikesPostsRepositoryInterface;
-use GeekBrains\LevelTwo\Blog\UUID;
+//use GeekBrains\LevelTwo\Blog\Commands\Arguments;
+//use GeekBrains\LevelTwo\Blog\Commands\CreateUserCommand;
+//use GeekBrains\LevelTwo\Blog\Exceptions\AppException;
+use GeekBrains\LevelTwo\Blog\Commands\FakeData\PopulateDB;
+use GeekBrains\LevelTwo\Blog\Commands\Posts\DeletePost;
+use GeekBrains\LevelTwo\Blog\Commands\Users\CreateUser;
+use GeekBrains\LevelTwo\Blog\Commands\Users\UpdateUser;
+use Symfony\Component\Console\Application;
 use Psr\Log\LoggerInterface;
 
 // Подключаем файл bootstrap.php
 // и получаем настроенный контейнер
 $container = require __DIR__ . '/bootstrap.php';
-$logger = $container->get(LoggerInterface::class);
-try {
+//$logger = $container->get(LoggerInterface::class);
+
+// Создаём объект приложения
+$application = new Application();
+
+// Перечисляем классы команд
+$commandsClasses = [
+    CreateUser::class,
+    DeletePost::class,
+    UpdateUser::class,
+    // Добавили команду генерирования тестовых данных
+    PopulateDB::class,
+];
+
+foreach ($commandsClasses as $commandClass) {
+    $command = $container->get($commandClass);
+    $application->add($command);
+}
+
+$application->run();
+
+
+
+
+
+
+
+
+
+
+
+
+
+// создание пользователя без symphony
+//try {
+
+    // При помощи контейнера создаём команду
+    //    $command = $container->get(CreateUserCommand::class);
+    //    $command->handle(Arguments::fromArgv($argv));
+    //} catch (AppException $e) {
+    ////    $logger->error($e->getMessage(), ['exception' => $e]);
+    //    echo "{$e->getMessage()}\n";
+    //}
 
 //    $likesPostsRepository = $container->get(LikesPostsRepositoryInterface::class);
 //
@@ -19,35 +63,6 @@ try {
 //    print_r($likesPosts);
 //
 //    die();
-
-    // При помощи контейнера создаём команду
-    $command = $container->get(CreateUserCommand::class);
-    $command->handle(Arguments::fromArgv($argv));
-} catch (AppException $e) {
-//    $logger->error($e->getMessage(), ['exception' => $e]);
-    echo "{$e->getMessage()}\n";
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //require_once __DIR__ . '/vendor/autoload.php';
 //
@@ -164,5 +179,3 @@ try {
     // var_dump($comment->getPost());
 // $commentsRepository->save($comment);
 //echo $commentsRepository->get($id_comment);
-
-

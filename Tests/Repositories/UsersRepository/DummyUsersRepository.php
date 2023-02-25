@@ -1,8 +1,9 @@
 <?php
 
-namespace GeekBrains\LevelTwo\Blog\Repositories\UsersRepository;
+namespace GeekBrains\LevelTwo\Blog\UnitTests\Repositories\UsersRepository;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\UserNotFoundException;
+use GeekBrains\LevelTwo\Blog\Repositories\UsersRepository\UsersRepositoryInterface;
 use GeekBrains\LevelTwo\Person\Name;
 use GeekBrains\LevelTwo\Blog\User;
 use GeekBrains\LevelTwo\Blog\UUID;

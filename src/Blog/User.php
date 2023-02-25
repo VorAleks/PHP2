@@ -4,13 +4,13 @@ namespace GeekBrains\LevelTwo\Blog;
 
 use GeekBrains\LevelTwo\Blog\Exceptions\InvalidArgumentException;
 use GeekBrains\LevelTwo\Person\Name;
+use JetBrains\PhpStorm\Pure;
 
 class User
 {
     public function __construct(
         private UUID $uuid,
         private string $username,
-        // Переименовали поле password
         private string $hashedPassword,
         private Name $name
         ) {
@@ -23,7 +23,7 @@ class User
     }
 
     // Функция для проверки предъявленного пароля
-    public function checkPassword(string $password): bool
+    #[Pure] public function checkPassword(string $password): bool
     {
         return $this->hashedPassword === self::hash($password, $this->uuid);
     }
