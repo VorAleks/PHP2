@@ -23,7 +23,6 @@ $commandsClasses = [
     CreateUser::class,
     DeletePost::class,
     UpdateUser::class,
-    // Добавили команду генерирования тестовых данных
     PopulateDB::class,
 ];
 

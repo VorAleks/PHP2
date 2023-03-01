@@ -41,10 +41,18 @@ class SqliteLikesCommentsRepository implements LikesCommentsRepositoryInterface
         ]);
         $result = $statement->fetch(PDO::FETCH_ASSOC);
         if ($result === false) {
-            $statement = $this->connection->prepare(
-                'INSERT INTO likes_comments (uuid, comment_uuid, author_uuid)
-        VALUES (:uuid, :comment_uuid, :author_uuid)'
-            );
+            $query = "
+                INSERT INTO likes_comments (
+                    uuid,
+                    comment_uuid,
+                    author_uuid
+                ) VALUES (
+                    :uuid,
+                    :comment_uuid,
+                    :author_uuid
+                )
+            ";
+            $statement = $this->connection->prepare($query);
             $newLikeCommentUuid = (string)$like->uuid();
             $statement->execute([
                 ':uuid' =>  (string)$like->uuid(),

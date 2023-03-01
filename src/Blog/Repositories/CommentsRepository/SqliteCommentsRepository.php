@@ -25,11 +25,22 @@ class SqliteCommentsRepository implements CommentsRepositoryInterface
 
     public function save(Comment $comment): void
     {
-        // Подготавливаем запрос
-        $statement = $this->connection->prepare(
-        'INSERT INTO comments (uuid, post_uuid, author_uuid, text)
-        VALUES (:uuid, :post_uuid, :author_uuid, :text)'
-        );
+        $query = "
+            INSERT INTO comments (
+                uuid,
+                post_uuid,
+                author_uuid,
+                text
+            ) VALUES (
+                :uuid,
+                :post_uuid,
+                :author_uuid,
+              :text
+            )
+            ON CONFLICT (uuid) DO UPDATE SET
+                text = :text
+        ";
+        $statement = $this->connection->prepare($query);
         $newCommentUuid = (string)$comment->uuid();
         // Выполняем запрос с конкретными значениями
         $statement->execute([
